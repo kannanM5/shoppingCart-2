@@ -1,13 +1,32 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import MainComponent from "./MainComponent";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-export default function RouterConfigure() {
+import MainComponent from "./MainComponent";
+import Cart from "./Cart";
+
+const Router = createBrowserRouter([
+  {
+    path: "/",
+
+    children: [
+      {
+        index: true,
+        element: <MainComponent />,
+      },
+      {
+        path: "cart",
+        element: <Cart />,
+      },
+    ],
+  },
+]);
+
+function RouterConfigure() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<MainComponent />} />
-      </Routes>
-    </Router>
+    <div>
+      <RouterProvider router={Router} />
+    </div>
   );
 }
+
+export default RouterConfigure;

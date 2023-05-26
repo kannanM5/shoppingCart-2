@@ -5,8 +5,9 @@ import classes from "../src/myApp.module.css";
 import heart from "../src/icons8-heart-24.png";
 import minus from "../src/icons8-minus-24.png";
 import plus from "../src/icons8-plus-24.png";
+import cart from "../src/icons8-cart-30.png";
 import QtyCount from "./ButtonCount";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import {
   fetchdataFailure,
@@ -15,12 +16,15 @@ import {
   incrementCount,
   decrementCount,
   addToCart,
+  viewToCart,
 } from "./redux/reducer";
 import { trimString } from "./Utilities/common";
 
 export default function MainComponent() {
   const dispatch = useDispatch();
   const dataitems = useSelector((state) => state.Data);
+  const navigate = useNavigate();
+  const cartValue = useSelector((state) => state.Data.data.cartCount);
 
   const fetchData = () => {
     dispatch(fetchdataRequest());
@@ -33,7 +37,7 @@ export default function MainComponent() {
           return {
             ...ele1,
             Qty: 1,
-            cartCount: 0,
+            viewStatus: 0,
           };
         });
 
@@ -57,67 +61,80 @@ export default function MainComponent() {
     return <div>Error: {dataitems.error}</div>;
   }
 
+  const addtocart = (ele) => {
+    dispatch(addToCart(ele));
+    // ele.viewStatus === 1 ? navigate("/cart") : navigate("/");
+  };
+
+  const viewCart = (ele) => {
+    dispatch(viewToCart(ele));
+    ele.viewStatus === 1 ? navigate("/cart") : navigate("/");
+  };
+
   return (
     <div>
-      <div className={classes.cartbutton}>
-        <button className="btn btn-warning px-4 py-0">cart</button>
-        {dataitems.data.map((ele, i) => {
-          return (
-            <div key={ele.product_id} className={classes.cartCount}>
-              {ele.cartCount}
-            </div>
-          );
-        })}
-        <div className={classes.cartCount}>{dataitems.cartCount}</div>
+      <div className={classes.cartBtn}>
+        <button
+          onClick={() => navigate("/cart")}
+          className="btn btn-success mt-2 px-3 py-0 "
+        >
+          Cart <span className={classes.cartCount}> {dataitems.cartCount}</span>
+        </button>
       </div>
 
       <div className={classes.content}>
         {dataitems.data.map((ele, i) => {
           return (
-            <Card className={classes.show} key={ele.product_id}>
-              <Card.Img
-                className={classes.image}
-                variant="top"
-                src={ele.img_path}
-              />
-              <Card.Body>
-                <Card.Title className={classes.title}>
-                  {trimString(ele.name, 40)}
-                </Card.Title>
-                <Card.Title className={classes.price}>{ele.price}</Card.Title>
-                <div className={classes.hide}>
-                  <img
-                    className={classes.wishlist}
-                    src={heart}
-                    alt="wishList"
-                  />
+            <React.Fragment key={ele.product_id}>
+              <Card className={classes.show}>
+                <Card.Img
+                  className={classes.image}
+                  variant="top"
+                  src={ele.img_path}
+                />
+                <Card.Body>
+                  <Card.Title className={classes.title}>
+                    {trimString(ele.name, 40)}
+                  </Card.Title>
+                  <Card.Title className={classes.price}>{ele.price}</Card.Title>
+                  <div className={classes.hide}>
+                    <img
+                      className={classes.wishlist}
+                      src={heart}
+                      alt="wishList"
+                    />
 
-                  <button className={classes.incrementCount}>
-                    <img
-                      className={classes.countImage1}
-                      src={plus}
-                      alt="plus"
-                      onClick={() => {
-                        dispatch(incrementCount(ele.product_id));
-                      }}
-                    />
-                    {ele.Qty}
-                    <img
-                      className={classes.countImage2}
-                      src={minus}
-                      alt="plus"
-                      onClick={() => dispatch(decrementCount(ele.product_id))}
-                    />
-                  </button>
-                  <button
-                    onClick={() => dispatch(addToCart(ele.product_id))}
-                    className={classes.cart}
-                  >
-                    Add to cart{ele.cartCount}
-                  </button>
-                </div>
-              </Card.Body>
-            </Card>
+                    <button className={classes.incrementCount}>
+                      <img
+                        className={classes.countImage1}
+                        src={plus}
+                        alt="plus"
+                        onClick={() => {
+                          dispatch(incrementCount(ele.product_id));
+                        }}
+                      />
+                      {ele.Qty}
+                      <img
+                        className={classes.countImage2}
+                        src={minus}
+                        alt="plus"
+                        onClick={() => dispatch(decrementCount(ele.product_id))}
+                      />
+                    </button>
+                    <button
+                      onClick={
+                        ele.viewStatus === 1
+                          ? () => viewCart(ele)
+                          : () => addtocart(ele)
+                      }
+                      className={classes.cart}
+                    >
+                      {ele.viewStatus === 1 ? "view cart" : "Add to cart"}
+                    </button>
+                  </div>
+                </Card.Body>
+              </Card>
+            </React.Fragment>
           );
         })}
       </div>

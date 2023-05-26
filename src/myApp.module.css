@@ -1,14 +1,14 @@
 .content{
   text-align: center;
-  margin: 20px 0 30px 0;
+  margin: 10px 0 30px 0;
 }
 .show{
     width: 21%;
    margin: 10px;
     display: inline-block;
     margin: 10px;
-    border: 1px solid rgb(182, 184, 182);
-    height: 250px;
+    border: 1px solid rgb(198, 253, 198);
+    height: 253px;
     padding: 5px;
 }
 .show:hover{
@@ -47,20 +47,20 @@
 .incrementCount{
    position: absolute;
    left: 14px;
-   padding: 1px 15px;
-   background-color: grey;
+   background-color: rgb(121, 117, 117);
 }
+
 .incrementCount,.cart{
     bottom: 10px;
     font-size: 14px;
     border-radius: 5px;
+    padding: 2px 15px;
     border: none;
 }
 .cart{
     position: absolute;
     left: 165px;
-    padding: 1px 15px;
-    background-color: yellow;
+    background-color: rgb(245, 190, 40);
 }
 .countImage1{
     width: 12px;
@@ -82,19 +82,39 @@
     position: relative;
   
 }
+
+.removeCart{
+    background-color: rgb(247, 104, 104);
+    position: absolute;
+    left: 165px;
+    padding: 1px 15px;
+    bottom: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: none;
+}
+.dataImg{
+    width: 130px;
+}
+.topNav{
+   display: flex;
+   justify-content: space-between;
+   margin-bottom: 10px;
+}
+.cartBtn {
+   text-align: right;
+   margin: 10px 20px 0 0 ;
+}
 .cartCount{
-    background-color: red;
-
-    border-radius: 20px;
-    /* display: inline-block; */
-     position: absolute;
-     top: 6px;
-     right: 8px;
-    font-size: 10px;
-    padding: 1px 3px;
-
+    background-color: rgb(240, 156, 77);
+    padding: 2px 3px;
+    font-size: 12px;
+    border-radius: 2px;
+    margin-left: 4px;
+   text-align: center;
 
 }
+
 
 
 
