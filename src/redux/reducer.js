@@ -9,6 +9,10 @@ const initialState = {
   wishlistCount: 0,
 };
 
+const findIndexById = (array, id) => {
+  return array.findIndex((item) => parseInt(item.product_id) === parseInt(id));
+};
+
 export const dataSlice = createSlice({
   name: "Data",
   initialState,
@@ -28,32 +32,31 @@ export const dataSlice = createSlice({
     },
     CountQty: (state, action) => {
       let dataValue = [...state.data];
-      let dataIndex = dataValue.findIndex(
-        (ele) => parseInt(ele.product_id) === parseInt(action.payload.id)
-      );
-
       let cartValue = [...state.cartItems];
-      let cartIndex = cartValue.findIndex(
-        (ele) => parseInt(ele.product_id) === parseInt(action.payload.id)
-      );
+      const { id, type } = action.payload;
+
+      let dataIndex = findIndexById(dataValue, id);
+      let cartIndex = findIndexById(cartValue, id);
 
       if (dataIndex > -1) {
-        if (action.payload.type === "INC") {
+        if (type === "INC") {
           dataValue[dataIndex].Qty += 1;
-          state.cartItems[cartIndex].Qty += 1;
-        } else if (
-          action.payload.type === "DEC" &&
-          dataValue[dataIndex].Qty > 1
-        ) {
+        } else if (type === "DEC" && dataValue[dataIndex].Qty > 1) {
           dataValue[dataIndex].Qty -= 1;
-          state.cartItems[dataIndex].Qty -= 1;
         }
+      
+      if (cartIndex > -1) {
+        if (type === "INC") {
+          cartValue[cartIndex].Qty += 1;
+        } else if (type === "DEC" && cartValue[cartIndex].Qty > 1) {
+          cartValue[cartIndex].Qty -= 1;
+        }
+
+      let removeDollar = cartValue[cartIndex].price.substring(1);
+      let sub_Total1 = parseInt(removeDollar * cartValue[cartIndex].Qty);
+      cartValue[cartIndex].sub_Total = sub_Total1;
       }
-
-      let removeDollar = state.cartItems[cartIndex].price.substring(1);
-
-      let sub_Total1 = parseInt(removeDollar * state.cartItems[cartIndex].Qty);
-      state.cartItems[cartIndex].sub_Total = sub_Total1;
+    }
     },
 
     addToCart: (state, action) => {
@@ -68,35 +71,29 @@ export const dataSlice = createSlice({
         { name, img_path, price, Qty, sub_Total, product_id },
       ];
 
-      let ind = dataValue.findIndex(
-        (ele) =>
-          parseInt(ele.product_id) === parseInt(action.payload.product_id)
-      );
+      let dataIndex = findIndexById(dataValue, action.payload.product_id);
 
-      if (ind > -1) {
-        dataValue[ind].viewStatus = 1;
+      if (dataIndex > -1) {
+        dataValue[dataIndex].viewStatus = 1;
       }
     },
 
     removeItem: (state, action) => {
+      let dataValue = [...state.data];
       state.cartItems.splice(action.payload.index, 1);
       alert("Are you sure to remove the product from the cart?");
       state.cartCount -= 1;
 
-      let dataValue = [...state.data];
-      let dataIndex = dataValue.findIndex(
-        (ele) => parseInt(ele.product_id) === parseInt(action.payload.id)
-      );
+      let dataIndex = findIndexById(dataValue, action.payload.id);
       dataValue[dataIndex].Qty = 1;
       dataValue[dataIndex].viewStatus = 0;
     },
     emptyCart: (state, action) => {
+      let dataValue = [...state.data];
       state.cartItems.splice(0, state.cartItems.length);
       state.cartCount = 0;
-      let dataValue = [...state.data];
-      let dataIndex = dataValue.findIndex(
-        (ele) => parseInt(ele.product_id) === parseInt(action.payload)
-      );
+   
+      let dataIndex = findIndexById(dataValue, action.payload);
 
       dataValue[dataIndex].Qty = 1;
       dataValue[dataIndex].viewStatus = 0;
@@ -104,32 +101,19 @@ export const dataSlice = createSlice({
 
     wishlist: (state, action) => {
       let dataValue = [...state.data];
-
-      let dataIndex = dataValue.findIndex(
-        (ele) => parseInt(ele.product_id) === parseInt(action.payload)
-      );
+      let dataIndex = findIndexById(dataValue, action.payload);
 
       if (dataIndex > -1) {
         dataValue[dataIndex].wishlist = !dataValue[dataIndex].wishlist;
       }
 
-      if (dataValue[dataIndex].wishlist) {
-        state.wishlistCount += 1;
-      } else {
-        state.wishlistCount -= 1;
-      }
+      dataValue[dataIndex].wishlist
+        ? (state.wishlistCount += 1)
+        : (state.wishlistCount -= 1);
     },
   },
 });
 
-export const {
-  fetchdataRequest,
-  fetchdatasuccess,
-  fetchdataFailure,
-  CountQty,
-  addToCart,
-  removeItem,
-  emptyCart,
-  wishlist,
-} = dataSlice.actions;
+export const { fetchdataRequest, fetchdatasuccess,fetchdataFailure,CountQty,
+               addToCart,removeItem, emptyCart, wishlist} = dataSlice.actions;
 export default dataSlice.reducer;

@@ -35,18 +35,14 @@ export default function Cart() {
               variant="secondary"
               style={{ fontSize: "12px" }}
               onClick={() => navigate("/")}
-            >
-              Home
-            </Button>
+            > Home</Button>
           </div>
           <div>
             <Button
               variant="primary"
               style={{ fontSize: "12px" }}
               onClick={() => emptycart(dataItems.cartItems)}
-            >
-              Empty Cart
-            </Button>
+            >  Empty Cart </Button>
           </div>
         </div>
 

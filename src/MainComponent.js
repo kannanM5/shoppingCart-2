@@ -8,14 +8,7 @@ import minus from "../src/icons8-minus-24.png";
 import plus from "../src/icons8-plus-24.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  fetchdataFailure,
-  fetchdataRequest,
-  fetchdatasuccess,
-  CountQty,
-  addToCart,
-  wishlist,
-} from "./redux/reducer";
+import {fetchdataFailure,fetchdataRequest,fetchdatasuccess,CountQty,addToCart,wishlist,} from "./redux/reducer";
 import { trimString } from "./Utilities/common";
 
 export default function MainComponent() {
@@ -86,10 +79,7 @@ export default function MainComponent() {
             <React.Fragment key={ele.product_id}>
               <Card className={classes.show}>
                 <Card.Img
-                  className={classes.image}
-                  variant="top"
-                  src={ele.img_path}
-                />
+                  className={classes.image} variant="top" src={ele.img_path}  />
                 <Card.Body>
                   <Card.Title className={classes.title}>
                     {trimString(ele.name, 40)}
@@ -122,7 +112,6 @@ export default function MainComponent() {
                             CountQty({
                               id: ele.product_id,
                               type: "INC",
-                              Qty: ele.Qty,
                             })
                           );
                         }}
