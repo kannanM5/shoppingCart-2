@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import classes from "../src/myApp.module.css";
-import { removeItem, emptyCart } from "./redux/reducer";
+import { removeItem, emptyCart, CountQty } from "./redux/reducer";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useNavigate } from "react-router";
@@ -9,30 +9,22 @@ import { useNavigate } from "react-router";
 export default function Cart() {
   const dataItems = useSelector((state) => state.Data);
   const [modalShow, setModalShow] = useState(false);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  let setVal = localStorage.setItem(
-    "data",
-    JSON.stringify(dataItems.cartItems)
-  );
-  let getVAl = localStorage.getItem("data");
-  let localCartArr = JSON.parse(getVAl);
-  console.log(localCartArr);
+  const emptycart = (arr) => {
+    arr.map((e, i) => {
+      return dispatch(emptyCart(e.product_id));
+    });
 
-  const removeCartItem = (i) => {
-    dispatch(removeItem(i));
-  };
-
-  const emptycart = () => {
-    dispatch(emptyCart());
     setModalShow(true);
   };
 
   let total = dataItems.cartItems.reduce((acc, cur) => {
     return acc + cur.sub_Total;
   }, 0);
-  let newTotal = `₹${total}.00`;
+  let newTotal = `₹  ${total}.00`;
 
   return (
     <>
@@ -51,7 +43,7 @@ export default function Cart() {
             <Button
               variant="primary"
               style={{ fontSize: "12px" }}
-              onClick={() => emptycart()}
+              onClick={() => emptycart(dataItems.cartItems)}
             >
               Empty Cart
             </Button>
@@ -69,8 +61,8 @@ export default function Cart() {
               <th>Remove Item</th>
             </tr>
           </thead>
-          <tbody style={{ fontSize: "14px" }}>
-            {localCartArr.map((e, i) => {
+          <tbody style={{ fontSize: "14px", cursor: "pointer" }}>
+            {dataItems.cartItems.map((e, i) => {
               return (
                 <React.Fragment key={i}>
                   <tr className="text-center align-baseline">
@@ -84,12 +76,32 @@ export default function Cart() {
                         />
                       }
                     </td>
-                    <td>{e.Qty}</td>
+                    <td>
+                      <span
+                        onClick={() =>
+                          dispatch(CountQty({ id: e.product_id, type: "INC" }))
+                        }
+                        className={classes.plus}
+                      >
+                        +
+                      </span>
+                      {e.Qty}
+                      <span
+                        onClick={() =>
+                          dispatch(CountQty({ id: e.product_id, type: "DEC" }))
+                        }
+                        className={classes.sub}
+                      >
+                        -
+                      </span>
+                    </td>
                     <td>{e.price}</td>
                     <td>₹{e.sub_Total}.00</td>
                     <td>
                       <button
-                        onClick={() => removeCartItem(i)}
+                        onClick={() =>
+                          dispatch(removeItem({ id: e.product_id, index: i }))
+                        }
                         style={{ fontSize: "12px" }}
                         className="btn btn-danger px-2 py-1 "
                       >
@@ -122,7 +134,7 @@ function MyVerticallyCenteredModal(props) {
   return (
     <Modal
       {...props}
-      size="lg"
+      size="md"
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >

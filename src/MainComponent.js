@@ -1,22 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Card } from "react-bootstrap";
 import classes from "../src/myApp.module.css";
 import heart from "../src/icons8-heart-24.png";
+import heart1 from "../src/icons8-heart-suit-48.png";
 import minus from "../src/icons8-minus-24.png";
 import plus from "../src/icons8-plus-24.png";
-import cart from "../src/icons8-cart-30.png";
-import QtyCount from "./ButtonCount";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   fetchdataFailure,
   fetchdataRequest,
   fetchdatasuccess,
-  incrementCount,
-  decrementCount,
+  CountQty,
   addToCart,
-  viewToCart,
+  wishlist,
 } from "./redux/reducer";
 import { trimString } from "./Utilities/common";
 
@@ -24,7 +22,6 @@ export default function MainComponent() {
   const dispatch = useDispatch();
   const dataitems = useSelector((state) => state.Data);
   const navigate = useNavigate();
-  const cartValue = useSelector((state) => state.Data.data.cartCount);
 
   const fetchData = () => {
     dispatch(fetchdataRequest());
@@ -38,11 +35,10 @@ export default function MainComponent() {
             ...ele1,
             Qty: 1,
             viewStatus: 0,
+            wishlist: false,
           };
         });
-
         dispatch(fetchdatasuccess(refData));
-        console.log(dispatch(fetchdatasuccess(refData)));
       })
       .catch((error) => {
         dispatch(fetchdataFailure(error));
@@ -50,8 +46,8 @@ export default function MainComponent() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (dataitems.data.length === 0) fetchData();
+  });
 
   if (dataitems.isLoading) {
     return <div>Loading...</div>;
@@ -63,17 +59,19 @@ export default function MainComponent() {
 
   const addtocart = (ele) => {
     dispatch(addToCart(ele));
-    // ele.viewStatus === 1 ? navigate("/cart") : navigate("/");
   };
 
   const viewCart = (ele) => {
-    dispatch(viewToCart(ele));
     ele.viewStatus === 1 ? navigate("/cart") : navigate("/");
   };
 
   return (
     <div>
       <div className={classes.cartBtn}>
+        <button className="btn btn-secondary mt-2 px-3 py-0  mx-3">
+          Wish List
+          <span className={classes.cartCount}> {dataitems.wishlistCount}</span>
+        </button>
         <button
           onClick={() => navigate("/cart")}
           className="btn btn-success mt-2 px-3 py-0 "
@@ -98,11 +96,21 @@ export default function MainComponent() {
                   </Card.Title>
                   <Card.Title className={classes.price}>{ele.price}</Card.Title>
                   <div className={classes.hide}>
-                    <img
-                      className={classes.wishlist}
-                      src={heart}
-                      alt="wishList"
-                    />
+                    {ele.wishlist ? (
+                      <img
+                        className={classes.wishlist}
+                        src={heart1}
+                        alt="wishList"
+                        onClick={() => dispatch(wishlist(ele.product_id))}
+                      />
+                    ) : (
+                      <img
+                        className={classes.wishlist}
+                        src={heart}
+                        alt="wishList"
+                        onClick={() => dispatch(wishlist(ele.product_id))}
+                      />
+                    )}
 
                     <button className={classes.incrementCount}>
                       <img
@@ -110,15 +118,25 @@ export default function MainComponent() {
                         src={plus}
                         alt="plus"
                         onClick={() => {
-                          dispatch(incrementCount(ele.product_id));
+                          dispatch(
+                            CountQty({
+                              id: ele.product_id,
+                              type: "INC",
+                              Qty: ele.Qty,
+                            })
+                          );
                         }}
                       />
-                      {ele.Qty}
+                      <span className={classes.Qty}> {ele.Qty}</span>
                       <img
                         className={classes.countImage2}
                         src={minus}
                         alt="plus"
-                        onClick={() => dispatch(decrementCount(ele.product_id))}
+                        onClick={() =>
+                          dispatch(
+                            CountQty({ id: ele.product_id, type: "DEC" })
+                          )
+                        }
                       />
                     </button>
                     <button
